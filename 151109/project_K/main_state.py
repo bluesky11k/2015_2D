@@ -97,7 +97,6 @@ class aircraft:
         aircraftshotnow = aircraftShot(self.x, self.y)
         aircraftShot.append(aircraftshotnow)
 
-
 class EnemySmall:
     image = None
 
@@ -138,10 +137,10 @@ class EnemyBoss:
         self.image.draw(300, 780)
 
 
-class EnemyBarrage:
+class enemybarrage:
     def __init__(self):
         #self.x, self.y = x, y
-        EnemyBarrage.image = load_image('resource/barrageitem.png')
+        enemybarrage.image = load_image('resource/barrageitem.png')
 
     def update(self):
         pass
@@ -176,23 +175,23 @@ class aircraftShot:
 
 
 def enter():
-    global aircraft, background, EnemySmall, EnemyBoss, EnemyBarrage, aircraftShot
+    global aircraft, background, EnemySmall, EnemyBoss, enemybarrage, aircraftShot
     background = background()
     aircraft = aircraft()
 
     EnemySmall = EnemySmall()
     EnemyBoss = EnemyBoss()
-    EnemyBarrage = EnemyBarrage()
+    enemybarrage = enemybarrage()
     aircraftShot = aircraftShot()
 
 
 def exit():
-    global aircraft, background, EnemySmall, EnemyBoss, EnemyBarrage, aircraftShot
+    global aircraft, background, EnemySmall, EnemyBoss, enemybarrage, aircraftShot
     del(aircraft)
     del(background)
     del(EnemySmall)
     del(EnemyBoss)
-    del(EnemyBarrage)
+    del(enemybarrage)
     del(aircraftShot)
 
 
@@ -232,11 +231,9 @@ def update():
 
     for EnemySmall in EnemySmall_team:
         EnemySmall.update()
-
     for aircraftShot in aircraftShotList:
         aircraftShot.update()
-
-    EnemyBarrage.update()
+    enemybarrage.update()
 
 
 def draw():
@@ -248,7 +245,7 @@ def draw():
     for aircraftShot in aircraftShotList:
         aircraftShot.draw()
     EnemyBoss.draw()
-    EnemyBarrage.draw()
+    enemybarrage.draw()
 
     update_canvas()
 
