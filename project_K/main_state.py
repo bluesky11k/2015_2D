@@ -21,6 +21,7 @@ EnemySmall = None
 EnemyBoss = None
 font = None
 
+updateI = 0
 EnemySmall_count=0
 posX, posY = 0, 0
 aircraftShot_count = 0
@@ -223,27 +224,31 @@ def handle_events():
 open_canvas()
 
 
-EnemySmall_team = [EnemySmall() for i in range(4)]
+EnemySmall_List = [EnemySmall() for i in range(4)]
 aircraftShotList = [aircraftShot() for i in range(100)]
 
 
 def update():
+    global updateI
     aircraft.update()
 
-    for EnemySmall in EnemySmall_team:
+    for EnemySmall in EnemySmall_List:
         EnemySmall.update()
 
+    aircraftShotList[(int)(updateI/10)].y = 0
     for aircraftShot in aircraftShotList:
         aircraftShot.update()
 
     EnemyBarrage.update()
+    if updateI<999:
+        updateI=updateI+1
 
 
 def draw():
     clear_canvas()
     background.draw()
     aircraft.draw()
-    for EnemySmall in EnemySmall_team:
+    for EnemySmall in EnemySmall_List:
         EnemySmall.draw()
     for aircraftShot in aircraftShotList:
         aircraftShot.draw()
