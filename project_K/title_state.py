@@ -1,4 +1,4 @@
-#__author__ = 'samsung'
+#__author__ = 'KimSeunghyeon'
 import game_framework
 import main_state
 from pico2d import *
@@ -11,9 +11,11 @@ def enter():
     global image
     image = load_image('resource/title_600800.png')
 
+
 def exit():
     global image
     del(image)
+
 
 def handle_events():
     events = get_events()
@@ -26,10 +28,12 @@ def handle_events():
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 game_framework.change_state(main_state)
 
+
 def draw():
     clear_canvas()
     image.draw(300, 400)
     update_canvas()
+
 
 def update():
     pass

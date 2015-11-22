@@ -1,45 +1,126 @@
-#__author__ = 'samsung'
+#__author__ = 'KimSeunghyeon'
 
 import random
 import os
 import sys
+import math
+
+# import Boy class from boy.py
+from pico2d import *
+from tanmak import *
 from builtins import print
 from tkinter.constants import RIGHT
+from tile import TileMap
 
-from pico2d import *
 import game_framework
-
-
 import title_state
-
 
 name = "MainState"
 
 aircraft = None
 background = None
-EnemySmall = None
-EnemyBoss = None
+enemy_small = None
+enemy_boss = None
 font = None
 
-updateI = 0
-EnemySmall_count=0
+EnemySmall_count = 0
 posX, posY = 0, 0
-aircraftShot_count = 0
-aircraftShot = list()
+aircraftshot_count = 0
+aircraft_shot = []
+updateI = 0
+
+C_Barrage = 20
+C_Barrage_Speed = 1
+C_Barrage_Odd = 1
+N_Barrage = 20 # same as C_Barrage
+N_Theta = 5
+N_X = 0
+N_Y = 1
+#circle missile
+(cvx, cvy) = init_circle_bullets(C_Barrage, C_Barrage_Speed, C_Barrage_Odd)
+#nway missile
+(nvx, nvy) = init_nway_bullets(N_X, N_Y, N_Theta, N_Barrage)
+#guided missile
+(gvx, gvy) = init_nway_bullets(N_X, N_Y, N_Theta, N_Barrage)
 
 
-class background:
+#def create_world():
+    # global boy, grass, balls, big_balls
+    # boy = Boy()
+    # big_balls = [BigBall() for i in range(10)]
+    # balls = [Ball() for i in range(10)]
+    # balls = big_balls + balls
+    # grass = Grass()
+
+
+#def destroy_world():
+    # global boy, grass, balls, big_balls
+    # del(boy)
+    # del(balls)
+    # del(grass)
+    # del(big_balls)
+
+
+def init_g():
+    global gvx, gvy
+    (gvx, gvy) = init_nway_bullets(N_X, N_Y, N_Theta, N_Barrage)
+
+
+class Background:
     def __init__(self):
         self.image = load_image('resource/background02.png')
 
     def draw(self):
         self.image.draw(300, 400)
 
+    # PIXEL_PER_METER = (10.0 / 0.3)           # (10.0 / 0.3) = 10 pixel 30 cm
+    # SCROLL_SPEED_KMPH = 100.0                # Km / Hour
+    # SCROLL_SPEED_MPM = (SCROLL_SPEED_KMPH * 1000.0 / 60.0)
+    # SCROLL_SPEED_MPS = (SCROLL_SPEED_MPM / 60.0)
+    # SCROLL_SPEED_PPS = (SCROLL_SPEED_MPS * PIXEL_PER_METER)
+    #
+    # def __init__(self, w, h):
+    #     self.image = load_image('resource/background02.png')
+    #     self.speed = 0
+    #     self.up = 0
+    #     self.bottom = 0
+    #     self.screen_width = w
+    #     self.screen_height = h
+    #
+    # def draw(self):
+    #     y = int(self.up)
+    #     h = min(self.image.h - y, self.screen_height)
+    #     self.image.clip_draw_to_origin (0, y, self.screen_width, h, 0, 0)
+    #     self.image.clip_draw_to_origin (0, 0, self.screen_width, self.screen_height - h, 0, h)
+    #
+    # def get_bb(self):
+    #     pass
+    #
+    # def update(self, frame_time):
+    #     self.up = (self.up + frame_time * self.speed) % self.image.h
+    #
+    # def draw_bb(self):
+    #     pass
+    #
+    # def handle_event(self, event):
+    #     if event.type == SDL_KEYDOWN:
+    #         if event.key == SDLK_UP: self.speed -= Background.SCROLL_SPEED_PPS
 
-class aircraft:
+
+class Aircraft:
+    # PIXEL_PER_METER = (10.0 / 0.3)           # 10 pixel 30 cm
+    # MOVE_SPEED_KMPH = 20.0                    # Km / Hour
+    # MOVE_SPEED_MPM = (MOVE_SPEED_KMPH * 1000.0 / 60.0)
+    # MOVE_SPEED_MPS = (MOVE_SPEED_MPM / 60.0)
+    # MOVE_SPEED_PPS = (MOVE_SPEED_MPS * PIXEL_PER_METER)
+    #
+    # TIME_PER_ACTION = 0.5
+    # ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    # FRAMES_PER_ACTION = 8
+
     image = None
 
-    STOP, GO = 0,1
+    STOP, GO = 0, 1
 
     def __init__(self):
         self.x, self.y = 0, 90
@@ -48,7 +129,8 @@ class aircraft:
         self.stateD = self.STOP
         self.stateL = self.STOP
         self.stateR = self.STOP
-        aircraft.image = load_image('resource/aircraft.png')
+        if Aircraft.image == None:
+            Aircraft.image = load_image('resource/aircraft00.png')
         self.dir = 1
 
     def handle_event(self, event):
@@ -92,11 +174,33 @@ class aircraft:
         posY = self.y
 
     def draw(self):
-        self.image.draw(self.x, self.y, 100, 100)
+        self.image.draw(self.x, self.y, 59, 55)
 
-    def aircraftShooting(self):
-        aircraftshotnow = aircraftShot(self.x, self.y)
-        aircraftShot.append(aircraftshotnow)
+    def aircraft_shooting(self):
+        aircraft_shot_now = aircraft_shot(self.x, self.y)
+        aircraft_shot.append(aircraft_shot_now)
+
+
+class AircraftShot:
+    global aircraft
+
+    def __init__(self):
+        global posX, posY
+        global shooting
+        AircraftShot.image = load_image('resource/shot00.png')
+        self.x, self.y = posX + 0, posY + 35
+
+    def update(self):
+        self.y += 5
+        if self.y > 800:
+            self.x, self.y = posX + 0, posY + 35
+
+
+    def draw(self):
+        self.image.draw(self.x, self.y, 8, 15)
+
+    def get_bb(self):
+        return self.x - 50, self.y - 50, self.x + 50, self.y + 50
 
 
 class EnemySmall:
@@ -128,7 +232,7 @@ class EnemySmall:
                 print('crash')
 
     def draw(self):
-        self.image.draw(self.x, self.y, 100, 100)
+        self.image.draw(self.x, self.y, 75, 75)
 
 
 class EnemyBoss:
@@ -140,61 +244,71 @@ class EnemyBoss:
 
 
 class EnemyBarrage:
+
     def __init__(self):
-        #self.x, self.y = x, y
+        self.x, self.y = 300, 780 # boss
         EnemyBarrage.image = load_image('resource/barrageitem.png')
+        self.which = 'c'
 
-    def update(self):
-        pass
-        # self.y += 5
-        # if(self.y > 800):
-        #     self.y = 0
+    def update(self, i, airx, airy): #airx and y = aircraft x and y
+        if(self.which == 'c'):
+            self.x -= cvx[i]
+            self.y -= cvy[i]
+
+        if(self.which == 'n'):
+            self.x -= nvx[i]
+            self.y -= nvy[i]
+
+        if(self.which == 'g'):
+            vx_new, vy_new = update_guided_bullets(self.x, self.y, gvx[i], gvy[i], airx, airy)
+
+            if(airy + 50 < self.y):
+                gvx[i] = vx_new
+                gvy[i] = vy_new
+
+            self.x -= gvx[i]
+            self.y -= (gvy[i])
+
+        x_dist = self.x - 300
+        y_dist = self.y - 780
+
+        if x_dist * x_dist + y_dist * y_dist > 780 * 780:
+            self.y = 780
+            self.x = 300
+
+            if(self.which == 'n'):
+                self.which = 'c'
+            elif(self.which == 'c'):
+                #init_g()
+                self.which = 'g'
+            elif(self.which == 'g'):
+                self.which = 'n'
 
     def draw(self):
-        self.image.draw(287, 687)
-        #self.image.draw(self.x, self.y + 30)
-
-
-class aircraftShot:
-    global aircraft
-
-    def __init__(self):
-        global posX, posY
-        global shooting
-        aircraftShot.image = load_image('resource/shot00.png')
-        self.x, self.y = posX + 0, posY + 65
-
-    def update(self):
-         self.y += 5
-         if self.y > 800:
-             self.x, self.y = posX + 0, posY + 65
-
-    def draw(self):
-        self.image.draw(self.x, self.y)
-
-    def get_bb(self):
-        return self.x-50, self.y-50, self.x+50, self.y+50
+        self.image.draw(self.x, self.y, 13, 13)
 
 
 def enter():
-    global aircraft, background, EnemySmall, EnemyBoss, EnemyBarrage, aircraftShot
-    background = background()
-    aircraft = aircraft()
+    global aircraft, background, enemy_small, enemy_boss, enemy_barrage, aircraft_shot
+    #create_world()
 
-    EnemySmall = EnemySmall()
-    EnemyBoss = EnemyBoss()
-    EnemyBarrage = EnemyBarrage()
-    aircraftShot = aircraftShot()
+    background = Background()
+    enemy_boss = EnemyBoss()
+    aircraft = Aircraft()
+    enemy_small = EnemySmall()
+    enemy_barrage = EnemyBarrage()
+    aircraft_shot = AircraftShot()
 
 
 def exit():
-    global aircraft, background, EnemySmall, EnemyBoss, EnemyBarrage, aircraftShot
+    global aircraft, background, enemy_small, enemy_boss, enemy_barrage, aircraft_shot
+    #destroy_world()
     del(aircraft)
     del(background)
-    del(EnemySmall)
-    del(EnemyBoss)
-    del(EnemyBarrage)
-    del(aircraftShot)
+    del(enemy_boss)
+    del(enemy_small)
+    del(enemy_barrage)
+    del(aircraft_shot)
 
 
 def pause():
@@ -223,39 +337,61 @@ def handle_events():
 
 open_canvas()
 
+enemybarrage_List = [EnemyBarrage() for i in range(N_Barrage)]
+enemysmall_List = [EnemySmall() for i in range(4)]
+aircraftshot_List = [AircraftShot() for i in range(100)]
 
-EnemySmall_List = [EnemySmall() for i in range(4)]
-aircraftShotList = [aircraftShot() for i in range(100)]
+
+def collide(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+
+    if left_a > right_b: return False
+    if right_a < left_b: return False
+    if top_a < bottom_b: return False
+    if bottom_a > top_b: return False
+
+    return True
 
 
 def update():
     global updateI
+
     aircraft.update()
 
-    for EnemySmall in EnemySmall_List:
-        EnemySmall.update()
+    for enemy_small in enemysmall_List:
+        enemy_small.update()
 
-    aircraftShotList[(int)(updateI/10)].y = 0
-    for aircraftShot in aircraftShotList:
-        aircraftShot.update()
+    aircraftshot_List[(int)(updateI/15)].y = 0
 
-    EnemyBarrage.update()
-    if updateI<999:
-        updateI=updateI+1
+    for aircraft_shot in aircraftshot_List:
+        aircraft_shot.update()
+
+    i = 0
+    for enemy_barrage in enemybarrage_List: # aircraft x,y attribute to implement guided missile
+        enemy_barrage.update(i, aircraft.x, aircraft.y)
+        i += 1
+
+    if updateI < 999:
+        updateI += 1
 
 
 def draw():
     clear_canvas()
     background.draw()
     aircraft.draw()
-    for EnemySmall in EnemySmall_List:
-        EnemySmall.draw()
-    for aircraftShot in aircraftShotList:
-        aircraftShot.draw()
-    EnemyBoss.draw()
-    EnemyBarrage.draw()
+    enemy_boss.draw()
+
+
+    for enemy_small in enemysmall_List:
+        enemy_small.draw()
+
+    for aircraft_shot in aircraftshot_List:
+        aircraft_shot.draw()
+
+    for enemy_barrage in enemybarrage_List:
+        enemy_barrage.draw()
 
     update_canvas()
-
 
 close_canvas()

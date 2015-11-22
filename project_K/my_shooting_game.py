@@ -1,4 +1,4 @@
-#__author__ = 'samsung'
+#__author__ = 'KimSeunghyeon'
 
 import game_framework
 
