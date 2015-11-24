@@ -217,7 +217,7 @@ class EnemySmall:
         EnemySmall.image = load_image('resource/enemy01.png')
 
     def update(self):
-        global posX, posYg
+        global posX, posY
 
         self.y -= 2
 
@@ -229,7 +229,7 @@ class EnemySmall:
         if (posX+30 > self.x-50) and (posY+30 > self.y-50) and (posX-30 < self.x+50) and (posY-30 < self.y+50):
             if self.isCrash == False:
                 self.isCrash = True
-                print('crash')
+                print('crash-Enemy')
 
     def draw(self):
         self.image.draw(self.x, self.y, 75, 75)
@@ -249,15 +249,26 @@ class EnemyBarrage:
         self.x, self.y = 300, 780 # boss
         EnemyBarrage.image = load_image('resource/barrageitem.png')
         self.which = 'c'
+        self.isCrash = False
 
     def update(self, i, airx, airy): #airx and y = aircraft x and y
+        global posX, posY
         if(self.which == 'c'):
             self.x -= cvx[i]
             self.y -= cvy[i]
+            if (posX+30 > self.x-50) and (posY+30 > self.y-50) and (posX-30 < self.x+50) and (posY-30 < self.y+50):
+                if self.isCrash == False:
+                    self.isCrash = True
+                    print('crash-Circle Bullet')
 
         if(self.which == 'n'):
             self.x -= nvx[i]
             self.y -= nvy[i]
+
+            if (posX+30 > self.x-50) and (posY+30 > self.y-50) and (posX-30 < self.x+50) and (posY-30 < self.y+50):
+                if self.isCrash == False:
+                    self.isCrash = True
+                    print('crash-Nway Bullet')
 
         if(self.which == 'g'):
             vx_new, vy_new = update_guided_bullets(self.x, self.y, gvx[i], gvy[i], airx, airy)
@@ -268,6 +279,12 @@ class EnemyBarrage:
 
             self.x -= gvx[i]
             self.y -= (gvy[i])
+
+            if (posX+30 > self.x-50) and (posY+30 > self.y-50) and (posX-30 < self.x+50) and (posY-30 < self.y+50):
+                if self.isCrash == False:
+                    self.isCrash = True
+                    print('crash-Guided Bullet')
+
 
         x_dist = self.x - 300
         y_dist = self.y - 780
@@ -284,8 +301,11 @@ class EnemyBarrage:
             elif(self.which == 'g'):
                 self.which = 'n'
 
+
+
     def draw(self):
         self.image.draw(self.x, self.y, 13, 13)
+        self.isCrash = False
 
 
 def enter():
