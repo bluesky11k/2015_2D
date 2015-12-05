@@ -1,6 +1,7 @@
 #__author__ = 'KimSeunghyeon'
 
 import random
+
 import os
 import sys
 import math
@@ -10,7 +11,7 @@ from pico2d import *
 from tanmak import *
 from builtins import print
 from tkinter.constants import RIGHT
-from tile import TileMap
+
 
 import game_framework
 import title_state
@@ -69,6 +70,9 @@ def init_g():
 class Background:
     def __init__(self):
         self.image = load_image('resource/background02.png')
+        self.bgm = load_music('resource/backgruoundmusic.mp3')
+        self.bgm.set_volume(64)
+        self.bgm.repeat_play()
 
     def draw(self):
         self.image.draw(300, 400)
@@ -132,6 +136,7 @@ class Aircraft:
         if Aircraft.image == None:
             Aircraft.image = load_image('resource/aircraft00.png')
         self.dir = 1
+
 
     def handle_event(self, event):
         if(event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
